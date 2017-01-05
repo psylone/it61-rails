@@ -24,7 +24,7 @@ class Ability
     if persisted_in_db
       can [:create], Event
       can [:participate, :leave], Event, published: true
-      can :find, Place
+      can [:create, :find], Place
       can [:profile, :edit, :settings, :settings_update], User, id: user.id
       can [:edit, :update, :destroy], organizer_id: user.id
     end

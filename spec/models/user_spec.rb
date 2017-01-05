@@ -63,6 +63,7 @@ RSpec.describe User, type: :model do
   describe "abilities" do
     subject(:ability) { Ability.new(user) }
     let!(:user) { nil }
+    let!(:place) { create(:place) }
     let!(:event) { create(:event) }
     let!(:published_event) { create(:event, :published) }
 
@@ -74,6 +75,8 @@ RSpec.describe User, type: :model do
 
       it { should_not have_abilities([:edit, :update, :destroy], user) }
       it { should_not have_abilities([:edit, :update, :destroy], event) }
+      it { should_not have_abilities([:create, :find], Place) }
+      it { should_not have_abilities([:edit, :update, :destroy], place) }
       it { should_not have_abilities([:read], event) }
     end
 
@@ -83,9 +86,11 @@ RSpec.describe User, type: :model do
       # manage himself
       it { should have_abilities([:edit, :update, :destroy], user) }
       it { should have_abilities([:participate, :leave], published_event) }
+      it { should have_abilities([:create, :find], Place) }
 
       it { should_not have_abilities([:edit, :update, :destroy], event) }
       it { should_not have_abilities([:participate, :leave], event) }
+      it { should_not have_abilities([:edit, :update, :destroy], place) }
     end
 
     context "when is a moderator" do
@@ -93,16 +98,18 @@ RSpec.describe User, type: :model do
       it { should have_abilities(:read, User.new) }
       it { should have_abilities(:read, event) }
       it { should have_abilities([:edit, :update, :publish, :unpublish], event) }
+      it { should have_abilities([:create, :find], Place) }
 
       it { should_not have_abilities(:destroy, User) }
       it { should_not have_abilities(:destroy, Place) }
+      it { should_not have_abilities([:edit, :update], place) }
     end
 
     context "when is an administrator" do
       let! (:user) { create(:user, :admin) }
-      it { should have_abilities(:manage, event) }
-      it { should have_abilities(:manage, published_event) }
-      it { should have_abilities(:manage, User) }
+      it { should have_abilities(:all, Event) }
+      it { should have_abilities(:all, User) }
+      it { should have_abilities(:all, Place) }
     end
   end
 end
